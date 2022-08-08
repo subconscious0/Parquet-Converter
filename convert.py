@@ -1,18 +1,12 @@
 import pyarrow.parquet as pq
 import pyarrow as pa
-import pickle
-
-
-def unpickle(file):
-    with open(file, 'rb') as fo:
-        dict = pickle.load(fo, encoding='bytes')
-    return dict
+from header import *
 
 
 def to_parquet(path):
-    print('start transforming ' + path + ' to parquet')
+    logging.info('start transforming {} to parquet...'.format(path))
     for typ in ['test', 'train']:
-        images = unpickle(path + '/' + typ + '_images.pkl')
+        images = unpickle(path + '\\' + typ + '_images.pkl')
         n, pic_size = images.shape
         table = pa.Table.from_arrays(
             [pa.array(images[:, i]) for i in range(pic_size)],
@@ -20,18 +14,18 @@ def to_parquet(path):
                 [pa.field(str(i), pa.uint8()) for i in range(pic_size)]
             )
         )
-        pq.write_table(table, path + '/' + typ + '_images.parquet')
+        pq.write_table(table, path + '\\' + typ + '_images.parquet', compression='GZIP')
 
-        labels = unpickle(path + '/' + typ + '_labels.pkl')
+        labels = unpickle(path + '\\' + typ + '_labels.pkl')
         table = pa.Table.from_arrays(
-            [labels],
+            [labels.reshape(-1)],
             schema=pa.schema(
                 [pa.field('label', pa.uint16())]
             )
         )
-        pq.write_table(table, path + '/' + typ + '_labels.parquet')
+        pq.write_table(table, path + '\\' + typ + '_labels.parquet', compression='GZIP')
 
-    print('finished transforming' + path)
+    logging.info('finished transforming {}.'.format(path))
 
 
 to_parquet('CIFAR-10')
