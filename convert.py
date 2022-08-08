@@ -1,4 +1,3 @@
-import pyarrow.parquet as pq
 import pyarrow as pa
 from header import *
 
@@ -14,7 +13,7 @@ def to_parquet(path):
                 [pa.field(str(i), pa.uint8()) for i in range(pic_size)]
             )
         )
-        pq.write_table(table, path + '\\' + typ + '_images.parquet', compression='GZIP')
+        toparquet(table, path + '\\' + typ + '_images.parquet')
 
         labels = unpickle(path + '\\' + typ + '_labels.pkl')
         table = pa.Table.from_arrays(
@@ -23,7 +22,7 @@ def to_parquet(path):
                 [pa.field('label', pa.uint16())]
             )
         )
-        pq.write_table(table, path + '\\' + typ + '_labels.parquet', compression='GZIP')
+        toparquet(table, path + '\\' + typ + '_labels.parquet')
 
     logging.info('finished transforming {}.'.format(path))
 

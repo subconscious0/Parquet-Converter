@@ -1,3 +1,4 @@
+import pyarrow.parquet as pq
 import logging
 import pickle
 import sys
@@ -16,3 +17,17 @@ def unpickle(file):
 def topickle(data, file):
     with open(os.path.join(workingDirectory, file), 'wb') as fo:
         pickle.dump(data, fo)
+
+
+def unparquet(file):
+    return pq.read_table(os.path.join(workingDirectory, file))
+
+
+def toparquet(data, file):
+    pq.write_table(data,
+                   os.path.join(workingDirectory, file),
+                   row_group_size=8 * 1024,
+                   compression='GZIP'
+                   )
+
+

@@ -1,4 +1,4 @@
-import pyarrow.parquet as pq
+import random
 import time
 from header import *
 
@@ -9,10 +9,8 @@ def test_pickle():
     ret = []
     for path in dataset_list:
         for typ in ['train', 'test']:
-            temp = unpickle(path + '\\' + typ + '_images.pkl')
-            ret.append(temp)
-            temp = unpickle(path + '\\' + typ + '_labels.pkl')
-            ret.append(temp)
+            ret.append(unpickle(path + '\\' + typ + '_images.pkl'))
+            ret.append(unpickle(path + '\\' + typ + '_labels.pkl'))
     return ret
 
 
@@ -20,10 +18,19 @@ def test_parquet():
     ret = []
     for path in dataset_list:
         for typ in ['train', 'test']:
-            temp = pq.read_table(path + '\\' + typ + '_images.parquet')
-            ret.append(temp)
-            temp = pq.read_table(path + '\\' + typ + '_labels.parquet')
-            ret.append(temp)
+            ret.append(unparquet(path + '\\' + typ + '_images.parquet'))
+            ret.append(unparquet(path + '\\' + typ + '_labels.parquet'))
+    return ret
+
+
+def test_parquet_partial_read():
+    ret = []
+    for path in dataset_list:
+        for typ in ['train', 'test']:
+            pf = pq.ParquetFile(os.path.join(workingDirectory, path + '\\' + typ + '_images.parquet'))
+            ret.append(pf.read_row_group(random.choice(list(range(pf.num_row_groups)))))
+            pf = pq.ParquetFile(os.path.join(workingDirectory, path + '\\' + typ + '_labels.parquet'))
+            ret.append(pf.read_row_group(random.choice(list(range(pf.num_row_groups)))))
     return ret
 
 
@@ -33,7 +40,10 @@ test_parquet()
 logging.info("parquet time: {}".format(time.perf_counter() - start_time))
 
 start_time = time.perf_counter()
+test_parquet_partial_read()
+logging.info("parquet partial time: {}".format(time.perf_counter() - start_time))
+
+start_time = time.perf_counter()
 test_pickle()
 logging.info("pickle time: {}".format(time.perf_counter() - start_time))
-
 
