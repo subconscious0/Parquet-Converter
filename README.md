@@ -4,6 +4,7 @@ A Parquet Converter For Open-Source ML Datasets
 ### Prerequisite
 
 Numpy: [install](https://numpy.org/install/)
+
 Pyarrow: [install](https://arrow.apache.org/docs/python/install.html)
 
 ### Usage - download CIFAR-10
@@ -18,11 +19,11 @@ Download and parse data using [this](https://github.com/hsjeong5/MNIST-for-Numpy
 
 Run the following command:
 
-'''
+```
 python preprocess_CIFAR.py
 python preprocess_MNIST.py
 python convert.py
-'''
+```
 
 These programs create pickle files and parquet files under `./CIFAR-10` and `./MNIST`.
 
